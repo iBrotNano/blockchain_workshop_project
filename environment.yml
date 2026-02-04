@@ -4,6 +4,8 @@ channels:
 dependencies:
   - bzip2=1.0.8=h2bbff1b_6
   - ca-certificates=2025.12.2=haa95532_0
+  - cffi=2.0.0=py314h02ab6af_1
+  - cryptography=46.0.3=py314habbc9f9_0
   - libexpat=2.7.3=h885b0b7_4
   - libffi=3.4.4=hd77b12b_1
   - libmpdec=4.0.0=h827c3e9_0
@@ -11,9 +13,10 @@ dependencies:
   - lz4-c=1.9.4=h2bbff1b_1
   - markdown-it-py=4.0.0=py314haa95532_1
   - mdurl=0.1.2=py314haa95532_0
-  - openssl=3.0.18=h543e019_0
+  - openssl=3.0.19=hbb43b14_0
   - pathspec=0.12.1=py314haa95532_1
   - pip=25.3=pyh0d26453_0
+  - pycparser=2.23=py314haa95532_0
   - pygments=2.19.2=py314haa95532_0
   - python=3.14.2=h3bc0a5a_101_cp314
   - python_abi=3.14=2_cp314
@@ -29,6 +32,7 @@ dependencies:
   - zlib=1.3.1=h02ab6af_0
   - zstd=1.5.7=h56299aa_0
   - pip:
+      - base58==2.1.1
       - prompt-toolkit==3.0.52
       - questionary==2.1.1
       - wcwidth==0.5.2
