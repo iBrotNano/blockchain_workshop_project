@@ -13,6 +13,7 @@ assignees: iBrotNano
 A user story for functionality from a user's perspective (user story) or a description of a system requirement in natural language (scenario).
 
 ### :question: Open Questions?
+
 1. @Who: What must be discussed?
 
 ### :construction: Blockers
