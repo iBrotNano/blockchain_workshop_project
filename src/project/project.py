@@ -7,6 +7,14 @@ class Project:
     files: list[Path]
 
     def __init__(self, project_path: Path):
+        """
+        Ininitialize the Project with the given project path.
+
+        :param self: Instance of Project
+        :type self: Project
+        :param project_path: Path to the project directory
+        :type project_path: Path
+        """
         self.project_path = project_path
         self.files = []
 

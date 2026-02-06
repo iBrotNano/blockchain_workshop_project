@@ -1,13 +1,18 @@
+from address.address import Address
 from project.project import Project
 from project.merkle_root import MerkleRoot
 from project.command_line import CommandLine
 from config.console import console
-from address.address import Address
+from address.custom_address import CustomAddress as CustomAddress
+from address.solana_address import SolanaAddress as SolanaAddress
 
-address = Address()
-console.print(f"Generated address: {address.address}")
-console.print(f"Public key (raw, hex): {address.public_key}")
-console.print(f"Private key (raw, hex): {address.private_key}")
+custom_address = CustomAddress(Address.generate_mnemonic())
+console.print(f"Generated custom address: {custom_address.get_address()}")
+console.print(f"Public key (raw, hex): {custom_address.get_pubkey()}")
+console.print(f"Mnemonic: {custom_address.get_mnemonic()}")
+console.print(custom_address.get_keypair())
+custom_address.save()
+
 # project_cli = CommandLine()
 # project = Project(project_cli.select_project_path())
 # merkle_root = MerkleRoot(project)
