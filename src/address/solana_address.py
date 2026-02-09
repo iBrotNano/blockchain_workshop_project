@@ -28,10 +28,23 @@ class SolanaAddress(Address):
         Generate the private key, public key, and address from the mnemonic seed phrase. The private key is derived
         using the Ed25519 algorithm, and the address is the Base58-encoded version of the public key.
         """
+        # TODO: Use a password in the to_seed function.
         seed = Mnemonic(MNEMONIC_LANGUAGE).to_seed(self.mnemonic)
         keypair = Keypair.from_seed(seed[:32])
         self.private_key = bytes(keypair)[:32]
         self.public_key = bytes(keypair)[32:]
         self.address = str(keypair.pubkey())
 
-    # TODO: Implement the _from_keypair method to load the keypair from the keyring and set the private key, public key, and address properties accordingly.
+    def _from_keypair(self, keypair: bytes):
+        """
+        Load the key pair from the keyring and set the private key, public key,
+        and address properties accordingly. The key pair is expected to be a
+        concatenation of the private and public key bytes.
+        :param self: Instance of CustomAddress
+        :param keypair: The concatenated private and public key bytes
+        :type keypair: bytes
+        """
+        kp = Keypair.from_bytes(keypair)
+        self.private_key = bytes(kp)[:32]
+        self.public_key = bytes(kp)[32:]
+        self.address = str(kp.pubkey())

@@ -30,6 +30,7 @@ class CustomAddress(Address):
         Generate the private key, public key, and address from the mnemonic seed phrase. The private key is derived
         using the Ed25519 algorithm, and the address is the Base58-encoded version of the public key.
         """
+        # TODO: Use a password in the to_seed function.
         seed = Mnemonic(MNEMONIC_LANGUAGE).to_seed(self.mnemonic)
         pk = ed25519.Ed25519PrivateKey.from_private_bytes(seed[:32])
         self.private_key = pk.private_bytes_raw()
