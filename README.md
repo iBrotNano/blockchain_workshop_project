@@ -39,3 +39,14 @@ An existing environment can be updated with:
 ```powershell
 conda env update -f environment.yml -n blockchain_workshop_project
 ```
+
+## Testing
+
+To make pytest and other Pylance find imports in the folder `src` or any subfolder of it, you need to configure the `PYTHONPATH` environment variable to include them. This can be done in `tests/conftest.py`:
+
+```python
+SRC_PATH = PROJECT_ROOT / "src" / "cli"
+
+if str(SRC_PATH) not in sys.path:
+    sys.path.insert(0, str(SRC_PATH))
+```

@@ -1,7 +1,7 @@
-import importlib
 import dotenv
 import config.config as config_module
-from conftest import reload_module
+
+from tests.helpers import reload_module
 
 
 def test_mnemonic_language_defaults_to_english(monkeypatch):
