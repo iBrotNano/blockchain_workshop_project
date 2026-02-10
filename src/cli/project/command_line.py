@@ -1,12 +1,79 @@
-from importlib.metadata import files
-from pathlib import Path
 import questionary
+
+from pathlib import Path
+from address.address import Address
+from address.custom_address import CustomAddress
+from address.index import Index
+from common.console import print_info
 from config.console import console
 from project.merkle_root import MerkleRoot
+from project.project import Project
+from validation.validators import iso8601_str_is_valid, striped_str_is_not_empty
+from datetime import datetime
 
 
 class CommandLine:
-    def select_project_path(self) -> Path | None:
+    address_index: Index
+
+    def __init__(self):
+        self.address_index = Index()
+
+    def show(self) -> str | None:
+        address = self._select_key()
+
+        if not address:
+            return
+
+        path = self._select_project_path()
+
+        if not path:
+            return
+
+        metadata = self._get_metadata()
+
+        if not metadata:
+            return
+
+        project = Project(path)
+        merkle_root = MerkleRoot(project)
+
+        if address:
+            print_info(
+                f"Data of the deployment record:\n\n\tSelected address: {address.get_address()}\n\n\tMerkle root: {merkle_root.get_merkle_root()}\n\n\tFiles included in the Merkle tree:\n{''.join(f'\t\t- {file}\n' for file in merkle_root.get_files())}"
+            )
+
+            # TODO: print metainformation
+            # TODO: Ask to create the deployment record and sign it.
+
+    def _select_key(self) -> Address | None:
+        """
+        Prompt the user to select a key from the address index.
+
+        :return: The selected Address instance or None if the user cancels the selection
+        :rtype: Address | None
+        """
+        address_names = self.address_index.get_all()
+
+        if not address_names:
+            print_info("No addresses found. Please generate an address first.")
+            return None
+
+        choices = [questionary.Choice(name, value=name) for name in address_names] + [
+            questionary.Choice(
+                "Cancel", value="Cancel"
+            )  # None does not work with questionary, so we use a specific value to represent cancellation
+        ]
+
+        selected_key = questionary.select(
+            "Select a key:", choices=choices, use_shortcuts=True
+        ).ask()
+
+        if selected_key is None or selected_key == "Cancel":
+            return None
+
+        return CustomAddress.load(selected_key)
+
+    def _select_project_path(self) -> Path | None:
         """
         Prompt the user to input the project directory path.
 
@@ -22,18 +89,33 @@ class CommandLine:
 
         return Path(directory_path)
 
-    def display_merkle_root(self, merkle_root: MerkleRoot) -> None:
-        """
-        Display the Merkle root to the user.
-
-        :param merkle_root: The computed Merkle root
-        :type merkle_root: None
-        """
-        console.print(f"Merkle root for:")
-        console.rule()
-
-        for file in merkle_root.get_files():
-            console.print(f"- {file}")
-
-        console.rule()
-        console.print(f"Merkle Root: {merkle_root.get_merkle_root()}")
+    def _get_metadata(self):
+        return questionary.form(
+            author=questionary.text(
+                "Who is the author of the deployment?",
+                validate=striped_str_is_not_empty,
+            ),
+            contact_info=questionary.text(
+                "What is the contact information of the author?",
+                validate=striped_str_is_not_empty,
+            ),
+            software_name=questionary.text(
+                "What software do you deploy?", validate=striped_str_is_not_empty
+            ),
+            version=questionary.text(
+                "What version do you deploy?", validate=striped_str_is_not_empty
+            ),
+            commit_hash=questionary.text(
+                "What is the commit hash of the deployed code?",
+                validate=striped_str_is_not_empty,
+            ),
+            repository_url=questionary.text(
+                "What is the url to commit in the repository?",
+                validate=striped_str_is_not_empty,
+            ),
+            timestamp=questionary.text(
+                "What was the local time of the deployment? (ISO 8601 format: YYYY-MM-DDTHH:MM:SS)",
+                validate=iso8601_str_is_valid,
+                default=datetime.now().isoformat(timespec="seconds"),
+            ),
+        ).ask()

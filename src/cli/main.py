@@ -6,6 +6,7 @@ from address.custom_address import CustomAddress as CustomAddress
 from address.solana_address import SolanaAddress as SolanaAddress
 from main_menu import CommandLine as menu
 from address.command_line import CommandLine as address_cli
+from project.command_line import CommandLine as project_cli
 
 
 def show_main_menu():
@@ -17,6 +18,9 @@ def show_main_menu():
 
         if command == main_menu.KEY_MANAGEMENT_COMMAND:
             address_cli().show()
+
+        if command == main_menu.CREATE_DEPLOYMENT_RECORD_COMMAND:
+            project_cli().show()
 
         if command == main_menu.EXIT_COMMAND or command is None:
             console.print("Goodbye! 👋")

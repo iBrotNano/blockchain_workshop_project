@@ -19,6 +19,7 @@ class MerkleRoot:
         """
         self.project = project
         self.files = project.list_all_files()
+        self.merkle_root = self._compute_root()
 
     def get_files(self) -> list[Path]:
         """
@@ -42,7 +43,7 @@ class MerkleRoot:
         """
         return self.merkle_root
 
-    def compute_root(self):
+    def _compute_root(self):
         """
         Compute the Merkle root from the list of files.
 

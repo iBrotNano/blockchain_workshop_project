@@ -4,6 +4,7 @@ import questionary
 class CommandLine:
     EXIT_COMMAND = "EXIT"
     KEY_MANAGEMENT_COMMAND = "KEY_MANAGEMENT"
+    CREATE_DEPLOYMENT_RECORD_COMMAND = "CREATE_DEPLOYMENT_RECORD"
 
     def show(self) -> str | None:
         """
@@ -16,6 +17,10 @@ class CommandLine:
             questionary.Choice(
                 "Key management",
                 value=self.KEY_MANAGEMENT_COMMAND,
+            ),
+            questionary.Choice(
+                "Create a deployment record",
+                value=self.CREATE_DEPLOYMENT_RECORD_COMMAND,
             ),
             questionary.Choice(
                 "Exit the application",
