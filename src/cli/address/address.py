@@ -1,8 +1,8 @@
 import base58
 import keyring
+import config.config as config
 
 from mnemonic import Mnemonic
-from config.config import MNEMONIC_LANGUAGE, APP_NAME
 from typing import Self
 
 
@@ -76,20 +76,30 @@ class Address:
         :return: A new mnemonic seed phrase
         :rtype: str
         """
-        return Mnemonic(MNEMONIC_LANGUAGE).generate()
+        return Mnemonic(config.MNEMONIC_LANGUAGE).generate()
 
-    def save(self):
+    def try_save(self) -> bool:
         """
         Saves the key pair in a secure way in Windows-Keychain/DPAPI in user scope using the keyring library.
         The key pair is stored as a concatenation of the private and public key bytes.
+
+        :param self: Instance of Address
+        :return: True if the key pair was saved successfully, False otherwise
         """
         try:
-            keyring.delete_password(f"{self.name}@{APP_NAME}", self.name)
-        except keyring.errors.PasswordDeleteError:
-            pass  # Ignore if the password does not exist
+            try:
+                keyring.delete_password(f"{self.name}@{config.APP_NAME}", self.name)
+            except keyring.errors.PasswordDeleteError:
+                pass  # Ignore if the password does not exist
 
-        encoded_keypair = base58.b58encode(self.get_keypair()).decode("ascii")
-        keyring.set_password(f"{self.name}@{APP_NAME}", self.name, encoded_keypair)
+            encoded_keypair = base58.b58encode(self.get_keypair()).decode("ascii")
+            keyring.set_password(
+                f"{self.name}@{config.APP_NAME}", self.name, encoded_keypair
+            )
+        except:
+            return False
+
+        return True
 
     @classmethod
     def load(cls, name: str) -> Self:
@@ -105,7 +115,7 @@ class Address:
         :return: An instance of the address with the loaded key pair
         :rtype: Self
         """
-        keypair_encoded = keyring.get_password(f"{name}@{APP_NAME}", name)
+        keypair_encoded = keyring.get_password(f"{name}@{config.APP_NAME}", name)
 
         if keypair_encoded is None:
             raise ValueError(f"No keypair found for name: {name}")
