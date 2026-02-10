@@ -10,3 +10,10 @@ def reload_module(module: ModuleType) -> None:
     :type module: ModuleType
     """
     importlib.reload(module)
+
+
+def fake_method_call(method: str, return_value):
+    def method_call(*args, **kwargs):
+        return type("Dummy", (), {method: lambda self: return_value})()
+
+    return method_call

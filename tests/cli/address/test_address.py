@@ -36,7 +36,7 @@ def test_saves_the_keypair(monkeypatch):
 
     monkeypatch.setattr(keyring, "set_password", fake_set_password)
     address = CustomAddress("Test", Address.generate_mnemonic())
-    address.save()
+    address.try_save()
 
     assert calls == [
         (
