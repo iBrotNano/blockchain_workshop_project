@@ -11,6 +11,9 @@
 ## Testing
 - Use `pytest` as the test framework.
 - Name tests `test_*.py` and test functions `test_*`.
+- No comments in tests, the test name should be descriptive enough.
+- No docstrings in tests, the test name should be descriptive enough.
+- No type hints in tests, the test name should be descriptive enough.
 
 ## Style
 - Prefer explicit imports and avoid wildcard imports.
