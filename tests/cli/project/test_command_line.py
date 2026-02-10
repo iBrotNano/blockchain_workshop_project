@@ -183,6 +183,7 @@ def test_show_prints_selected_address_when_both_present(monkeypatch):
 
     monkeypatch.setattr(cli, "_select_key", lambda: DummyAddress())
     monkeypatch.setattr(cli, "_select_project_path", lambda: Path("/tmp/project"))
+    monkeypatch.setattr(cli, "_get_metadata", lambda: {"author": "a"})
     monkeypatch.setattr("project.command_line.MerkleRoot", DummyMerkleRoot)
     calls = []
 

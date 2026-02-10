@@ -48,3 +48,5 @@ class SolanaAddress(Address):
         self.private_key = bytes(kp)[:32]
         self.public_key = bytes(kp)[32:]
         self.address = str(kp.pubkey())
+
+    # TODO: Implement sign()

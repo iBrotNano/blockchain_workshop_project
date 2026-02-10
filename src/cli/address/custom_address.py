@@ -33,7 +33,7 @@ class CustomAddress(Address):
         # TODO: Use a password in the to_seed function.
         seed = Mnemonic(config.MNEMONIC_LANGUAGE).to_seed(self.mnemonic)
         pk = ed25519.Ed25519PrivateKey.from_private_bytes(seed[:32])
-        self.private_key = pk.private_bytes_raw()
+        self.private_key = pk.private_bytes_raw()  # same as seed[:32]
         self.public_key = pk.public_key().public_bytes_raw()
         self.address = base58.b58encode(self.public_key).decode("ascii")
 
@@ -49,3 +49,17 @@ class CustomAddress(Address):
         self.private_key = keypair[:32]
         self.public_key = keypair[32:]
         self.address = base58.b58encode(self.public_key).decode("ascii")
+
+    # TODO Tests
+    def sign(self, message: bytes) -> bytes:
+        """
+        Sign a message using the private key of the address.
+
+        :param self: Instance of CustomAddress
+        :param message: The message to be signed
+        :type message: bytes
+        :return: The signature of the message
+        :rtype: bytes
+        """
+        private_key = ed25519.Ed25519PrivateKey.from_private_bytes(self.private_key)
+        return private_key.sign(message)

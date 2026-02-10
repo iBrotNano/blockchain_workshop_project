@@ -137,3 +137,17 @@ class Address:
         raise NotImplementedError(
             "This method should be implemented by subclasses of Address."
         )
+
+    def sign(self, message: bytes) -> bytes:
+        """
+        This method should be implemented by subclasses of Address
+        to sign a message using the private key and return the signature.
+        :param self: Instance of Address
+        :param message: The message to sign
+        :type message: bytes
+        :return: The signature of the message
+        :rtype: bytes
+        """
+        raise NotImplementedError(
+            "This method should be implemented by subclasses of Address."
+        )

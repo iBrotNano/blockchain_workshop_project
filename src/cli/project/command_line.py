@@ -5,7 +5,7 @@ from address.address import Address
 from address.custom_address import CustomAddress
 from address.index import Index
 from common.console import print_info
-from config.console import console
+from project.deployment_record import DeploymentRecord
 from project.merkle_root import MerkleRoot
 from project.project import Project
 from validation.validators import iso8601_str_is_valid, striped_str_is_not_empty
@@ -39,11 +39,19 @@ class CommandLine:
 
         if address:
             print_info(
-                f"Data of the deployment record:\n\n\tSelected address: {address.get_address()}\n\n\tMerkle root: {merkle_root.get_merkle_root()}\n\n\tFiles included in the Merkle tree:\n{''.join(f'\t\t- {file}\n' for file in merkle_root.get_files())}"
+                f"""Data of the deployment record:
+
+{''.join(f'\t{key}: {value}\n' for key, value in metadata.items())}
+                
+\tAddress: {address.get_address()}
+\tMerkle root: {merkle_root.get_merkle_root()}
+
+\tFiles included in the Merkle tree:
+
+{''.join(f'\t- {file}\n' for file in merkle_root.get_files())}"""
             )
 
-            # TODO: print metainformation
-            # TODO: Ask to create the deployment record and sign it.
+        self._deploy(address, merkle_root, metadata)
 
     def _select_key(self) -> Address | None:
         """
@@ -119,3 +127,12 @@ class CommandLine:
                 default=datetime.now().isoformat(timespec="seconds"),
             ),
         ).ask()
+
+    # TODO: Test that the deployment record is created and signed correctly when the user confirms the deployment.
+    def _deploy(self, address: Address, merkle_root: MerkleRoot, metadata: dict):
+        if questionary.confirm(
+            "Do you want to create the deployment record and sign it?"
+        ).ask():
+            payload, signature = DeploymentRecord(
+                address, merkle_root, metadata
+            ).serialize()
