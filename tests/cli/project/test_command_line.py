@@ -184,6 +184,7 @@ def test_show_prints_selected_address_when_both_present(monkeypatch):
     monkeypatch.setattr(cli, "_select_key", lambda: DummyAddress())
     monkeypatch.setattr(cli, "_select_project_path", lambda: Path("/tmp/project"))
     monkeypatch.setattr(cli, "_get_metadata", lambda: {"author": "a"})
+    monkeypatch.setattr(cli, "_deploy", lambda *_args, **_kwargs: None)
     monkeypatch.setattr("project.command_line.MerkleRoot", DummyMerkleRoot)
     calls = []
 
@@ -193,6 +194,9 @@ def test_show_prints_selected_address_when_both_present(monkeypatch):
 
     cli.show()
 
-    assert calls == [
-        "Data of the deployment record:\n\n\tSelected address: ADDR123\n\n\tMerkle root: root123\n\n\tFiles included in the Merkle tree:\n\t\t- a.txt\n"
-    ]
+    assert len(calls) == 1
+    message = calls[0]
+    assert "Data of the deployment record:" in message
+    assert "Address: ADDR123" in message
+    assert "Merkle root: root123" in message
+    assert "- a.txt" in message

@@ -1,15 +1,23 @@
 import msgpack
+import config.config as config
 
 from address.address import Address
-from config.config import DEPLOYMENT_RECORD_VERSION
 from project.merkle_root import MerkleRoot
 from config.console import console
 from datetime import datetime
+from typing import Any
+from hashlib import sha256
 
 
 # TODO: Test for the class.
 class DeploymentRecord:
-    def __init__(self, address: Address, merkle_root: MerkleRoot, metadata: dict):
+    address: Address
+    merkle_root: MerkleRoot
+    metadata: dict[str, Any]
+
+    def __init__(
+        self, address: Address, merkle_root: MerkleRoot, metadata: dict[str, Any]
+    ):
         """
         Initialize the DeploymentRecord with the given address, Merkle root, and metadata. The metadata is expected to be a dictionary containing relevant information about the deployment.
 
@@ -33,18 +41,24 @@ class DeploymentRecord:
         :return: A tuple containing the serialized deployment record and its signature
         :rtype: tuple[bytes, bytes]
         """
-        # Store UTC time as timestamp in seconds since the epoch.
-        self.metadata["timestamp"] = datetime.fromtimestamp(
-            datetime.fromisoformat(self.metadata["timestamp"]).timestamp()
+        # Works on a shallow copy of the metadata to avoid mutating the original metadata of the deployment record.
+        metadata = self.metadata.copy()
+        timestamp = metadata.get("timestamp")
+
+        # Convert the timestamp from ISO 8601 format to a UNIX timestamp.
+        metadata["timestamp"] = datetime.fromtimestamp(
+            datetime.fromisoformat(timestamp).timestamp()
         ).timestamp()
 
         record = {
-            "version": DEPLOYMENT_RECORD_VERSION,
+            "version": config.DEPLOYMENT_RECORD_VERSION,
             "address": self.address.get_address(),
             "merkle_root": self.merkle_root.get_merkle_root(),
-            "metadata": self.metadata,
+            "metadata": metadata,
         }
 
         serialized_record = msgpack.packb(record, use_bin_type=True)
-        signature = self.address.sign(serialized_record)
+        # Is more efficient to sign the hash with a fixed length than the serialized record.
+        record_hash = sha256(serialized_record).digest()
+        signature = self.address.sign(record_hash)
         return (serialized_record, signature)

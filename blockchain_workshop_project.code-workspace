@@ -7,6 +7,11 @@
 	"settings": {
 		"python.analysis.extraPaths": [
 			"${workspaceFolder}/src/cli"
-		]
+		],
+		"python.testing.pytestArgs": [
+			"tests"
+		],
+		"python.testing.pytestEnabled": true,
+		"python.testing.unittestEnabled": false
 	}
 }
