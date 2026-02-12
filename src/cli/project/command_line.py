@@ -1,3 +1,4 @@
+import asyncio
 import questionary
 
 from pathlib import Path
@@ -5,6 +6,7 @@ from address.address import Address
 from address.custom_address import CustomAddress
 from address.index import Index
 from common.console import print_info
+from project.client import Client
 from project.deployment_record import DeploymentRecord
 from project.merkle_root import MerkleRoot
 from project.project import Project
@@ -16,9 +18,19 @@ class CommandLine:
     address_index: Index
 
     def __init__(self):
+        """
+        Initializes the CommandLine instance and loads the address index.
+
+        :param self: Instance of CommandLine
+        """
         self.address_index = Index()
 
-    def show(self) -> str | None:
+    def show(self):
+        """
+        Displays a form to enter record data.
+
+        :param self: Instance of CommandLine
+        """
         address = self._select_key()
 
         if not address:
@@ -98,6 +110,11 @@ class CommandLine:
         return Path(directory_path)
 
     def _get_metadata(self):
+        """
+        Prompt the user to input the metadata for the deployment record.
+
+        :param self: Instance of CommandLine
+        """
         return questionary.form(
             author=questionary.text(
                 "Who is the author of the deployment?",
@@ -130,9 +147,23 @@ class CommandLine:
 
     # TODO: Test that the deployment record is created and signed correctly when the user confirms the deployment.
     def _deploy(self, address: Address, merkle_root: MerkleRoot, metadata: dict):
+        """
+        Prompt the user to confirm the deployment and create, sign, and send the deployment record to the service if confirmed.
+
+        :param self: Instance of CommandLine
+        :param address: The Address instance representing the address involved in the deployment
+        :type address: Address
+        :param merkle_root: The MerkleRoot instance representing the Merkle root of the deployed project
+        :type merkle_root: MerkleRoot
+        :param metadata: Dictionary containing metadata about the deployment
+        :type metadata: dict
+        """
         if questionary.confirm(
-            "Do you want to create the deployment record and sign it?"
+            "Do you want to create the deployment record, sign it and send it to the network?"
         ).ask():
             payload, signature = DeploymentRecord(
                 address, merkle_root, metadata
             ).serialize()
+
+            # TODO: Test that the payload and signature are sent to the service correctly.
+            asyncio.run(Client()._deploy_to_service(payload, signature))

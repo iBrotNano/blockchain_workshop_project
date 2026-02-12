@@ -14,6 +14,10 @@ class PeerNode:
     connected_peers: set[str]  # peers we have already contacted
     log_file: str  # TODO: Remove when we have proper logging
 
+    mempool: list[
+        tuple[bytes, bytes]
+    ]  # List of (payload, signature) tuples representing deployment records to be processed
+
     def __init__(self, host: str, port: int, bootstrap: str = None):
         """
         Initialize the PeerNode with the given host, port, and optional bootstrap peer.
@@ -30,6 +34,8 @@ class PeerNode:
         self.port = int(port)
         self.peers = set()  # unique set of peer addresses
         self.connected_peers = set()  # peers we have already contacted
+        self.mempool = []
+
         self.log_file = (
             f"peer_communication.log"  # TODO: Remove when we have proper logging
         )
@@ -64,6 +70,28 @@ class PeerNode:
 
         if msg["type"] == "hello":
             await self._handle_hello_message(msg, writer)
+
+        if msg["type"] == "add_deployment_record":
+            self.mempool.append(
+                (bytes.fromhex(msg["record"]), bytes.fromhex(msg["signature"]))
+            )
+
+            print(f"Received deployment record: {self.mempool[-1][0]}")
+            print(f"Signature: {self.mempool[-1][1]}")
+
+            writer.write(
+                (
+                    json.dumps(
+                        {
+                            "type": "add_deployment_record_response",
+                            "status": "success",
+                        }
+                    )
+                    + "\n"  # Note: the newline is important to signal the end of the message for readline()
+                ).encode()
+            )
+
+        await writer.drain()
 
         writer.close()
 

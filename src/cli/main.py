@@ -1,5 +1,3 @@
-import sys
-
 from config import config
 from config.console import console
 from address.custom_address import CustomAddress as CustomAddress
