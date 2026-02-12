@@ -3,6 +3,7 @@ import json
 
 from asyncio import StreamReader, StreamWriter
 from datetime import datetime
+from block import Block
 
 
 # TODO: Tests
@@ -72,26 +73,7 @@ class PeerNode:
             await self._handle_hello_message(msg, writer)
 
         if msg["type"] == "add_deployment_record":
-            self.mempool.append(
-                (bytes.fromhex(msg["record"]), bytes.fromhex(msg["signature"]))
-            )
-
-            print(f"Received deployment record: {self.mempool[-1][0]}")
-            print(f"Signature: {self.mempool[-1][1]}")
-
-            writer.write(
-                (
-                    json.dumps(
-                        {
-                            "type": "add_deployment_record_response",
-                            "status": "success",
-                        }
-                    )
-                    + "\n"  # Note: the newline is important to signal the end of the message for readline()
-                ).encode()
-            )
-
-        await writer.drain()
+            await self._handle_add_deployment_record(msg, writer)
 
         writer.close()
 
@@ -128,6 +110,30 @@ class PeerNode:
         )
 
         await self._broadcast_new_peer(msg)
+
+    async def _handle_add_deployment_record(self, msg: dict, writer: StreamWriter):
+        # TODO: The signature is not used for now. We should verify the signature and only add the record to the mempool if the signature is valid.
+        self.mempool.append(
+            (bytes.fromhex(msg["record"]), bytes.fromhex(msg["signature"]))
+        )
+
+        # TODO: The mempool is not used for reorgs right now.
+        record = self.mempool[0]
+        block = Block(record[0], record[1]).build()
+
+        writer.write(
+            (
+                json.dumps(
+                    {
+                        "type": "add_deployment_record_response",
+                        "status": "success",
+                    }
+                )
+                + "\n"  # Note: the newline is important to signal the end of the message for readline()
+            ).encode()
+        )
+
+        await writer.drain()
 
     def _update_own_peer_list(self, msg: dict):
         """
