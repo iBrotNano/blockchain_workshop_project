@@ -38,7 +38,7 @@ class PeerNode:
         self.peers = set()  # unique set of peer addresses
         self.connected_peers = set()  # peers we have already contacted
         self.mempool = []
-        self.blockchain = Blockchain()
+        # self.blockchain = Blockchain()
 
         self.log_file = (
             f"peer_communication.log"  # TODO: Remove when we have proper logging
@@ -250,7 +250,8 @@ class PeerNode:
 
     def close(self):
         """Close resources like the LevelDB handle."""
-        self.blockchain.close()
+        # self.blockchain.close()
+        # TODO: Activate the code
 
     # TODO: Remove this logging method. It is only for demonstration purposes to show the greetings in the log files.
     def _log_greeting(self, sender: str, receiver: str, message: str):

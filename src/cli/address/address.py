@@ -125,6 +125,17 @@ class Address:
         address._from_keypair(keypair)
         return address
 
+    def _from_mnemonic(self):
+        """
+        This method should be implemented by subclasses of Address
+        to generate the private key, public key, and address from the mnemonic seed phrase.
+        The implementation will depend on the specific blockchain and key derivation method used.
+        :param self: Instance of Address
+        """
+        raise NotImplementedError(
+            "This method should be implemented by subclasses of Address."
+        )
+
     def _from_keypair(self, keypair: bytes):
         """
         This method should be implemented by subclasses of Address
