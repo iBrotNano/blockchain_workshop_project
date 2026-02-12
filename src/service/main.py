@@ -5,6 +5,8 @@ import argparse
 from peer_node import PeerNode
 
 # TODO: Tests
+peer = None
+
 try:
     parser = argparse.ArgumentParser()
 
@@ -30,6 +32,9 @@ try:
     asyncio.run(peer.start())
 except KeyboardInterrupt:
     print("Shutting down...")
-    exit(0)
 except:
     traceback.print_exc()
+finally:
+    if peer is not None:
+        peer.close()
+    exit(0)

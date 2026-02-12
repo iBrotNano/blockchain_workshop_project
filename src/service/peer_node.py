@@ -4,6 +4,7 @@ import json
 from asyncio import StreamReader, StreamWriter
 from datetime import datetime
 from block import Block
+from blockchain import Blockchain
 
 
 # TODO: Tests
@@ -14,6 +15,7 @@ class PeerNode:
     peers: set[str]  # unique set of known peer addresses
     connected_peers: set[str]  # peers we have already contacted
     log_file: str  # TODO: Remove when we have proper logging
+    blockchain: Blockchain
 
     mempool: list[
         tuple[bytes, bytes]
@@ -36,6 +38,7 @@ class PeerNode:
         self.peers = set()  # unique set of peer addresses
         self.connected_peers = set()  # peers we have already contacted
         self.mempool = []
+        self.blockchain = Blockchain()
 
         self.log_file = (
             f"peer_communication.log"  # TODO: Remove when we have proper logging
@@ -119,7 +122,15 @@ class PeerNode:
 
         # TODO: The mempool is not used for reorgs right now.
         record = self.mempool[0]
+        # TODO: Fix getting last block.
+        # latest_block = self.blockchain.get_latest_block()
+        # previous_hash = Block.calculate_hash(latest_block) if latest_block else None
+        # print(previous_hash)
+        # block = Block(record[0], record[1], previous_hash).build()
         block = Block(record[0], record[1]).build()
+        print(block)
+        # self.blockchain.add_block(block)
+        self.mempool.pop(0)
 
         writer.write(
             (
@@ -236,6 +247,10 @@ class PeerNode:
             if new_peer not in self.connected_peers:
                 print(f"Hello {new_peer} 👋")
                 await self.connect_to_peer(new_peer)
+
+    def close(self):
+        """Close resources like the LevelDB handle."""
+        self.blockchain.close()
 
     # TODO: Remove this logging method. It is only for demonstration purposes to show the greetings in the log files.
     def _log_greeting(self, sender: str, receiver: str, message: str):

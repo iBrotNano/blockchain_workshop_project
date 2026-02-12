@@ -1,5 +1,7 @@
 import struct
+
 from datetime import datetime
+from hashlib import sha256
 
 
 class Block:
@@ -43,6 +45,10 @@ class Block:
         """
         header = self._build_header(len(self.payload), self.previous_hash)
         return header + self.payload + self.signature
+
+    @staticmethod
+    def calculate_hash(block: bytes) -> bytes:
+        return sha256(block).digest()
 
     def _build_header(
         self,
