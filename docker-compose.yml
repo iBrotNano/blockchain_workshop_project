@@ -1,0 +1,47 @@
+services:
+  peer1:
+    build: .
+    container_name: peer1
+    ports:
+      - "5001:5000"
+    command: python main.py --host 172.30.0.10 --port 5000
+    networks:
+      blockchain_network:
+        ipv4_address: 172.30.0.10
+    volumes:
+      - ./peer_communication.log:/app/peer_communication.log
+
+  peer2:
+    build: .
+    container_name: peer2
+    ports:
+      - "5002:5000"
+    command: python main.py --host 172.30.0.11 --port 5000 --bootstrap peer1:5000
+    depends_on:
+      - peer1
+    networks:
+      blockchain_network:
+        ipv4_address: 172.30.0.11
+    volumes:
+      - ./peer_communication.log:/app/peer_communication.log
+
+  peer3:
+    build: .
+    container_name: peer3
+    ports:
+      - "5003:5000"
+    command: python main.py --host 172.30.0.12 --port 5000 --bootstrap peer1:5000
+    depends_on:
+      - peer1
+    networks:
+      blockchain_network:
+        ipv4_address: 172.30.0.12
+    volumes:
+      - ./peer_communication.log:/app/peer_communication.log
+
+networks:
+  blockchain_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.30.0.0/24

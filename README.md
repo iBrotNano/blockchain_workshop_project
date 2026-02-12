@@ -31,7 +31,7 @@ conda activate blockchain_workshop_project
 > Both files need to be updated whenever new packages are added to the project or existing ones are updated.
 
 ```powershell
-conda list --export > requirements.txt & conda env export > environment.yml
+pip list --format=freeze > requirements.txt & conda env export > environment.yml
 ```
 
 An existing environment can be updated with:
@@ -55,4 +55,13 @@ The tests can then be run with:
 
 ```powershell
 pytest
+```
+
+Containers of the services can be bootstrapped with:
+
+```powershell
+docker compose up -d --build
+
+# Then connect with a local service
+python .\src\service\main.py --bootstrap 127.0.0.1:5001
 ```
